@@ -63,6 +63,11 @@ case "$1" in
             if ! [ ${ECODE} -eq 0 ]
               then
                 let ERRORS=ERRORS+1
+              else
+                if [ ${ERRORS} -gt 0 ]
+                  then
+                    ERRORS=0
+                fi
             fi
             sleep 600
       done
