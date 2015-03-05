@@ -1,0 +1,37 @@
+#!/bin/bash
+#Name wrapper-chan-dl.sh
+bold=$(tput bold)
+normal=$(tput sgr0)
+version="${bold}Version${normal} 0.1 by snowfag Yuki@lolicon.eu"
+if ! hash chan-dl 2>/dev/null
+  then
+    echo "To run this script you must have chan-dl in your path."
+    exit 1
+fi
+case "$1" in
+  -a)
+      echo "$2" >> "$HOME/.threadwatchlist"
+      ( chan-dl "$2" wrapper & )
+  ;;
+  -d)
+      escaped=$(echo "$2" | sed 's/[\/]/\\\//g')
+      sed -i "/^${escaped}$/d" "$HOME/.threadwatchlist"
+  ;;
+  -s)
+      for i in $(cat "$HOME/.threadwatchlist" )
+      do
+        ( chan-dl "$i" wrapper & )
+      done
+  ;;
+  -v)
+      echo -e "${version}"
+      exit 0
+  ;;
+  -h)
+      echo -e "${version}\n\n\t${bold}-a${normal} Adds url to thread watch list file and starts chan-dl on url\n\n\t${bold}-d${normal} Removes url from thread watch list file\n\n\t${bold}-s${normal} Starts chan-dl on all the urls contained within the thread watch list file\n\n\t${bold}-v${normal} Prints version info\n\n\t${bold}-h${normal} Prints this help info"
+  ;;
+  *)
+      echo "Invalid option. Try -h"
+      exit 1
+esac
+exit 0
