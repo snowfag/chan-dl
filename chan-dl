@@ -25,6 +25,11 @@ case "$1" in
           echo "No url entered."
           exit 1
         else
+          if ! [ $(echo "$2" | grep -q "^http://"; echo $?) -eq 0 ]
+            then
+              echo "Incorrect url format! Be sure your url begins with http://"
+              exit 1
+          fi
           site=$(echo "$2"| awk -F\/ '{print $3}')
       fi
       escaped=$(echo "$2" | sed 's/[\/]/\\\//g')
