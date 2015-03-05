@@ -26,7 +26,6 @@ case "$1" in
           site=$(echo "$2"| awk -F\/ '{print $3}')
       fi
       escaped=$(echo "$2" | sed 's/[\/]/\\\//g')
-      ECODE=0
       if [ ${site} == "boards.4chan.org" ]
         then
           domain="i.4cdn.org"
@@ -48,7 +47,8 @@ case "$1" in
             mkdir ${PWD}/${thread}
               cd ${PWD}/${thread}
       fi
-      while [ ${ECODE} -eq 0 ]
+      ERRORS=0
+      while [ ${ERRORS} -lt 6 ]
       do
             WGETO=$(wget -H --no-directories -D ${domain} -r -l 1 -U Mozilla -A jpeg,jpg,png,gif,webm -R '*s.*' -nc -e robots=off ${2} 2>&1)
             ECODE=$(echo $?)
@@ -62,30 +62,19 @@ case "$1" in
             fi
             if ! [ ${ECODE} -eq 0 ]
               then
-                sleep 600
-                WGETO=$(wget -H --no-directories -D ${domain} -r -l 1 -U Mozilla -A jpeg,jpg,png,gif,webm -R '*s.*' -nc -e robots=off ${2} 2>&1)
-                ECODE=$(echo $?)
-                DLCOUNT=$(echo "${WGETO}" | awk '/Downloaded/ {files=$2} END { print files }')
-                if ! [ -z "${DLCOUNT}" ]
-                  then
-                    if ! [ ${DLCOUNT} -eq 1 ]
-                      then
-                        echo "Downloaded Files: ${DLCOUNT}"
-                    fi
-                fi
-                if ! [ ${ECODE} -eq 0 ]
-                  then
-                    if [ ${threadwatcher} -eq 1 ]
-                      then
-                        sed -i "/^${escaped}$/d" "$HOME/.threadwatchlist"
-                    fi
-                      echo "Thread died."
-                      exit 1
-                fi
+                let ERRORS=ERRORS+1
             fi
-                sleep 600
+            sleep 600
       done
-      exit 0
+      if [ ${ERRORS} -eq 6 ]
+        then
+          if [ ${threadwatcher} -eq 1 ]
+            then
+              sed -i "/^${escaped}$/d" "$HOME/.threadwatchlist"
+          fi
+            echo "Thread died."
+            exit 1
+      fi
   ;;
   -a)
       echo "$2" >> "$HOME/.threadwatchlist"
