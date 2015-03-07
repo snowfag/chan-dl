@@ -89,6 +89,14 @@ case "$1" in
       fi
   ;;
   -a)
+      for i in $(cat "$HOME/.threadwatchlist")
+      do
+        if [ "$i" == "$2" ]
+          then
+            echo "Thread already being watched."
+            exit 1
+        fi
+      done
       echo "$2" >> "$HOME/.threadwatchlist"
       ( chan-dl -r "$2" threadwatcher & )
   ;;
@@ -97,7 +105,7 @@ case "$1" in
       sed -i "/^${escaped}$/d" "$HOME/.threadwatchlist"
   ;;
   -s)
-      for i in $(cat "$HOME/.threadwatchlist" )
+      for i in $(cat "$HOME/.threadwatchlist")
       do
         ( chan-dl -r "$i" threadwatcher & )
       done
