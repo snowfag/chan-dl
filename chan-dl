@@ -25,7 +25,7 @@ case "$1" in
           echo "No url entered."
           exit 1
         else
-		        if ! [ $(echo "$2" | grep -q "^http\(s\)\?://"; echo $?) -eq 0 ]
+          if ! [ $(echo "$2" | grep -q "^http\(s\)\?://"; echo $?) -eq 0 ]
             then
               echo "Incorrect url format! Be sure your url begins with http(s)://"
               exit 1
