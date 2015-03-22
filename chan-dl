@@ -25,9 +25,9 @@ case "$1" in
           echo "No url entered."
           exit 1
         else
-          if ! [ $(echo "$2" | grep -q "^http://"; echo $?) -eq 0 ]
+		        if ! [ $(echo "$2" | grep -q "^http\(s\)\?://"; echo $?) -eq 0 ]
             then
-              echo "Incorrect url format! Be sure your url begins with http://"
+              echo "Incorrect url format! Be sure your url begins with http(s)://"
               exit 1
           fi
           site=$(echo "$2"| awk -F\/ '{print $3}')
@@ -89,6 +89,11 @@ case "$1" in
       fi
   ;;
   -a)
+      if ! [ $(echo "$2" | grep -q "^http\(s\)\?://"; echo $?) -eq 0 ]
+        then
+          echo "Incorrect url format! Be sure your url begins with http(s)://"
+          exit 1
+      fi
       for i in $(cat "$HOME/.threadwatchlist")
       do
         if [ "$i" == "$2" ]
