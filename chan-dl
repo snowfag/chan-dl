@@ -58,6 +58,7 @@ case "$1" in
       while [ ${ERRORS} -lt 6 ]
       do
             WGETO=$(wget -H --no-directories -D ${domain} -r -l 1 -U Mozilla -A jpeg,jpg,png,gif,webm -R '*s.*' -nc -e robots=off ${2} 2>&1)
+            CHECK=$(wget -R '*' -nc -e robots=off ${2} 2>&1)
             ECODE=$(echo $?)
             DLCOUNT=$(echo "${WGETO}" | awk '/Downloaded/ {files=$2} END { print files }')
             if ! [ -z "${DLCOUNT}" ]
@@ -94,14 +95,19 @@ case "$1" in
           echo "Incorrect url format! Be sure your url begins with http(s)://"
           exit 1
       fi
-      for i in $(cat "$HOME/.threadwatchlist")
-      do
-        if [ "$i" == "$2" ]
-          then
-            echo "Thread already being watched."
-            exit 1
-        fi
-      done
+      if [ -f "$HOME/.threadwatchlist" ]
+      then
+        for i in $(cat "$HOME/.threadwatchlist")
+        do
+          if [ "$i" == "$2" ]
+            then
+              echo "Thread already being watched."
+              exit 1
+          fi
+        done
+      else
+        touch "$HOME/.threadwatchlist"
+      fi
       echo "$2" >> "$HOME/.threadwatchlist"
       ( chan-dl -r "$2" threadwatcher & )
   ;;
